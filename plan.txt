@@ -1,0 +1,14 @@
+|----------------External Functions---------------------|
+|scrambles inputs
+|shanking
+|custom vcs / custom channels in general
+|ping bot, create vc, ping someone else, bring them in (make easy to use)
+|join vc, creates chat, moves you to it, others can join
+|look into threads
+
+|---------------Technical Infrastructure----------------|
+|add test and prod versions of the bot
+|write a plugin / library manager
+|add web interface (low priority)
+|high avaliablity via virtualization (low priority)
+|integrate / potentially make a twitch bot (low priority)
