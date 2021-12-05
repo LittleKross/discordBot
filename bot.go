@@ -4,7 +4,10 @@ import(
 	"os"
 	"os/signal"
 	"io/ioutil"
+	"math/rand"
 	"syscall"
+	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -23,7 +26,8 @@ func main() {
 		log.Println("Error authenticating to the discord API\nError: ", err)
 		return
 	}
-	dg.AddHandler(messageCreate)
+	dg.AddHandler(messageScramble)
+	dg.AddHandler(pingPong)
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
 	err = dg.Open()
 	if err != nil {
@@ -37,13 +41,34 @@ func main() {
 	dg.Close()
 }
 
-func messageCreate (s *discordgo.Session, m *discordgo.MessageCreate) {
+func scramble (m string) string {
+	rand.Seed(time.Now().UnixNano())
+	var res strings.Builder
+	temp := strings.Split(m,"")
+	for i := 0; i < len(m); i++ {
+		res.WriteString(temp[rand.Intn(len(m))])
+	}
+	return res.String()
+}
+
+func messageScramble (s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	if m.Content != "ping" {
-		return
+	if m.Content != "ping" && m.Content != "pong" {
+		s.ChannelMessageSend(m.ChannelID,scramble(m.Content))
 	}
+}
+func pingPong (s *discordgo.Session, m *discordgo.MessageCreate) {
+
+	if m.Content == "ping" {
+		s.ChannelMessageSend(m.ChannelID,"Pong!")
+	}
+	if m.Content == "pong" {
+		s.ChannelMessageSend(m.ChannelID,"Ping!")
+	}
+	/*v1 responds in DM
+
 	channel,err := s.UserChannelCreate(m.Author.ID)
 	if err != nil {
 		log.Println("Error opening the DM!\nError: ", err)
@@ -55,5 +80,5 @@ func messageCreate (s *discordgo.Session, m *discordgo.MessageCreate) {
 	if err != nil {
 		log.Println("Error sending DM!\nError: ", err)
 		s.ChannelMessageSend(m.ChannelID,"Something went wrong while sending the DM!")
-	}
+	}*/
 }
