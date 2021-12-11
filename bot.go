@@ -8,7 +8,8 @@ import(
 	"syscall"
 	"strings"
 	"time"
-
+	
+	"github.com/littlekross/discordBot/main"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -26,8 +27,10 @@ func main() {
 		log.Println("Error authenticating to the discord API\nError: ", err)
 		return
 	}
+	plugins.load()
 	dg.AddHandler(messageScramble)
 	dg.AddHandler(pingPong)
+	dg.AddHandler(shank)
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
 	err = dg.Open()
 	if err != nil {
@@ -52,33 +55,31 @@ func scramble (m string) string {
 }
 
 func messageScramble (s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author.ID == s.State.User.ID {
-		return
-	}
-	if m.Content != "ping" && m.Content != "pong" {
-		s.ChannelMessageSend(m.ChannelID,scramble(m.Content))
+	if m.ChannelID == "474960608207568896" {
+		if m.Author.ID == s.State.User.ID {
+			return
+		}
+		if m.Content != "ping" && m.Content != "pong" && !strings.Contains(m.Content,"Botshirt, shank "){
+			s.ChannelMessageSend(m.ChannelID,scramble(m.Content))
+		}
 	}
 }
 func pingPong (s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	if m.Content == "ping" {
-		s.ChannelMessageSend(m.ChannelID,"Pong!")
+	//personal: 886821410595561492 //allegiant: 474960608207568896
+	if m.ChannelID == "474960608207568896"{
+		if m.Content == "ping" {
+			s.ChannelMessageSend(m.ChannelID,"Pong!")
+		}
+		if m.Content == "pong" {
+			s.ChannelMessageSend(m.ChannelID,"Ping!")
+		}
 	}
-	if m.Content == "pong" {
-		s.ChannelMessageSend(m.ChannelID,"Ping!")
+}
+func shank(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if m.ChannelID == "474960608207568896" {
+		if strings.Contains(m.Content, "Botshirt, shank ") {
+			s.ChannelMessageSend(m.ChannelID,m.Content[16:] + " has been shanked!")
+		}
 	}
-	/*v1 responds in DM
-
-	channel,err := s.UserChannelCreate(m.Author.ID)
-	if err != nil {
-		log.Println("Error opening the DM!\nError: ", err)
-		s.ChannelMessageSend(m.ChannelID,"Something went wrong while opening the DM!",
-		)
-		return
-	}
-	_, err = s.ChannelMessageSend(channel.ID,"Pong!")
-	if err != nil {
-		log.Println("Error sending DM!\nError: ", err)
-		s.ChannelMessageSend(m.ChannelID,"Something went wrong while sending the DM!")
-	}*/
 }
