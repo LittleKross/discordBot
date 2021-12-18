@@ -2,6 +2,7 @@ package plugins
 import(
 	"log"
 	"math/rand"
+	"regexp"
 	"strings"
 	"time"
 
@@ -12,10 +13,10 @@ func Load(s *discordgo.Session) {
 	s.AddHandler(messageScramble)
 	s.AddHandler(pingPong)
 	s.AddHandler(shank)
-	for i:=0;i<1;i++ {
+	log.Println("The plugins have been loaded! ✓ ")
+	/*for i:=0;i<1;i++ {
 		//s.AddHandler()
-		log.Println("The plugins have been loaded! ✓ ")
-	}
+	}*/
 	return
 }
 
@@ -40,6 +41,13 @@ func messageScramble (s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 }
+func isCommand (m string) bool {
+	re, err := regexp.Compile(`([Bb]otshirt|<@909138800482058372>)(\s|,\s)shank`)
+	if err != nil {
+		log.Println("Error compiling regex object\nError: ", err)
+	}
+	return re.MatchString(m)
+}
 func pingPong (s *discordgo.Session, m *discordgo.MessageCreate) {
 	//log.Println("The pingPong plugin has loaded ✓")
 	//personal: 886821410595561492 //allegiant: 474960608207568896
@@ -61,7 +69,7 @@ func shank (s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 	if m.ChannelID == "474960608207568896" {
-		if strings.Contains(m.Content, "Botshirt, shank ") {
+		if isCommand(m.Content){
 			s.ChannelMessageSend(m.ChannelID,m.Content[16:] + " has been shanked!")
 		}
 	}
