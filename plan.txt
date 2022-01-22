@@ -7,8 +7,9 @@
 |look into threads
 
 |---------------Technical Infrastructure----------------|
-|add test and prod versions of the bot
-|add regex to inputs
+|look into go inverted if statements (i.e. not nested)
+|add test and prod versions of the bot (Potential solution: manage via branches in github)
+-add regex to inputs
 |write a plugin / library manager
 |add web interface (low priority)
 |high avaliablity via virtualization (low priority)
