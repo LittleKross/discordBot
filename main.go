@@ -10,7 +10,7 @@ func main() {
 	// Authentication Token pulled from local file token.txt
 	TokenStream,err := ioutil.ReadFile("token.txt")
 	if err != nil {
-		log.Println("Error opening token file\nError: ", err)
+		log.Fatal("Error opening token file\nError:\n", err)
 		return
 	}
 	Token := string(TokenStream)

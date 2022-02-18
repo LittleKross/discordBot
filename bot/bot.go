@@ -18,24 +18,26 @@ type bot struct {
 }
 
 func New(token string) *bot {
-	dg, err := discordgo.New(token)
+	c, err := discordgo.New(token)
 	if err != nil {
-		log.Println("Error authenticating to the discord API\nError: ", err)
+		log.Fatal("Error authenticating to the discord API\nError:\n", err)
 	}
 	b := &bot {
-		client: dg,
+		client: c,
 	}
 	return b
 }
 
 func (b *bot) Run() {
 	plugins.Load(b.client)
-	b.client.Identify.Intents = discordgo.IntentsGuildMessages
+	b.client.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsAll)
 	err := b.client.Open()
 	if err != nil {
-		log.Println("Error opening connection to the discord API\nError: ", err)
+		log.Fatal("Error opening connection to the discord API\nError:\n", err)
 	}
 	log.Println("Bot is now running. Press CTRL-C to exit.")
+	plugins.CreateCommands(b.client)
+
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc

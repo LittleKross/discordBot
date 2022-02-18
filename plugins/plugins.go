@@ -10,9 +10,28 @@ import(
 )
 
 func Load(s *discordgo.Session) {
+	s.AddHandler(func(c *discordgo.Session, i *discordgo.InteractionCreate) {
+		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+			h(c, i)
+		}
+	})
+
+	//s.AddHandler(memes)
 	s.AddHandler(defaultCommands)
+	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
+		log.Println("Bot is up!")
+	})
 	log.Println("The plugins have been loaded! ✓ ")
 	return
+}
+
+func CreateCommands(s *discordgo.Session) {
+	for _, v := range commands {
+		_, err := s.ApplicationCommandCreate(s.State.User.ID, "470408764995141632", v)
+		if err != nil {
+			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+		}
+	}
 }
 
 func buildHelp () string {
@@ -67,7 +86,7 @@ func defaultCommands (s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	if m.ChannelID == channelID && isCommand(m.Content){
+	if m.ChannelID == channelID && isCommand(m.Content) {
 		command := getCommand(m.Content)
 		//adds cases for default commands
 		switch command {
@@ -86,3 +105,45 @@ func defaultCommands (s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 }
+
+func memes (s *discordgo.Session, t *discordgo.TypingStart) {
+	channelID := "474960608207568896"
+	if t.ChannelID == channelID {
+		s.ChannelMessageSend(channelID,"Hurry up and finish typing <@!" + t.UserID + ">!!!")
+	}
+}
+
+
+
+
+//Begin Slash Command Construction
+var(
+	commands = []*discordgo.ApplicationCommand {
+		{
+			Name: "ping",
+			Description: "You say ping, I say pong.",
+		},
+		{
+			Name: "pong",
+			Description: "You say pong, I say ping.",
+		},
+	}
+	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Pong!",
+				},
+			})
+		},
+		"pong": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Ping!",
+				},
+			})
+		},
+	}
+)
