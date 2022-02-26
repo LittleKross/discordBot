@@ -7,23 +7,24 @@ import (
 	"syscall"
 	
 	
+	//"github.com/littlekross/discordBot/bot/config"
 	"github.com/littlekross/discordBot/plugins"
 	"github.com/bwmarrin/discordgo"
 )
 
 type bot struct {
-
 	client *discordgo.Session
-
+	//config *config
 }
 
 func New(token string) *bot {
-	c, err := discordgo.New(token)
+	//c := config.New(token)
+	s, err := discordgo.New(token)
 	if err != nil {
 		log.Fatal("Error authenticating to the discord API\nError:\n", err)
 	}
 	b := &bot {
-		client: c,
+		client: s,
 	}
 	return b
 }
@@ -35,7 +36,7 @@ func (b *bot) Run() {
 	if err != nil {
 		log.Fatal("Error opening connection to the discord API\nError:\n", err)
 	}
-	log.Println("Bot is now running. Press CTRL-C to exit.")
+	
 	plugins.CreateCommands(b.client)
 
 	sc := make(chan os.Signal, 1)

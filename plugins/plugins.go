@@ -9,6 +9,42 @@ import(
 	"github.com/bwmarrin/discordgo"
 )
 
+type plugin struct {
+	title string
+	version string
+	json string
+}
+
+func New() *plugin {
+	p := &plugin {
+		title: "",
+		version: "",
+		json: "",
+	}
+	return p
+}
+
+//alternative constructors for requiring different inputs
+/*
+func New(t string) *plugin {
+	p := &plugin {
+		title: t,
+		version: "",
+		json: "",
+	}
+	return p
+}
+
+func New(t string, v string) *plugin {
+	p := {
+		title: t,
+		version: v,
+		json: "",
+	}
+	return p
+}
+*/
+
 func Load(s *discordgo.Session) {
 	s.AddHandler(func(c *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
@@ -19,7 +55,7 @@ func Load(s *discordgo.Session) {
 	//s.AddHandler(memes)
 	s.AddHandler(defaultCommands)
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
-		log.Println("Bot is up!")
+		log.Println("Bot is now running. Press CTRL-C to exit.")
 	})
 	log.Println("The plugins have been loaded! ✓ ")
 	return
@@ -127,6 +163,10 @@ var(
 			Name: "pong",
 			Description: "You say pong, I say ping.",
 		},
+		{
+			Name: "perpy",
+			Description: "This command does perpy things...",
+		},
 	}
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		"ping": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -142,6 +182,14 @@ var(
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
 					Content: "Ping!",
+				},
+			})
+		},
+		"perpy": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "No.",
 				},
 			})
 		},
